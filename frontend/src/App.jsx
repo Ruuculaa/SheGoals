@@ -26,7 +26,7 @@ function App() {
   // Cargar objetivos y sus respectivas subtareas
   const cargarObjetivos = async (token) => {
     try {
-      const respuesta = await axios.get('http://localhost:5000/api/objetivos/listar', {
+      const respuesta = await axios.get('https://shegoals.onrender.com/api/objetivos/listar', {
         headers: { Authorization: token }
       });
       setObjetivos(respuesta.data);
@@ -42,7 +42,7 @@ function App() {
 
   const cargarSubtareas = async (objetivoId, token) => {
     try {
-      const respuesta = await axios.get(`http://localhost:5000/api/subtareas/${objetivoId}`, {
+      const respuesta = await axios.get(`https://shegoals.onrender.com/api/subtareas/${objetivoId}`, {
         headers: { Authorization: token }
       });
       setSubtareas(prev => ({ ...prev, [objetivoId]: respuesta.data }));
@@ -59,7 +59,7 @@ function App() {
     if (!texto || !texto.trim()) return;
 
     try {
-      await axios.post('http://localhost:5000/api/subtareas/crear', { objetivo_id: objetivoId, texto }, {
+      await axios.post('https://shegoals.onrender.com/api/subtareas/crear', { objetivo_id: objetivoId, texto }, {
         headers: { Authorization: token }
       });
       setNuevaSubtareaTexto(prev => ({ ...prev, [objetivoId]: '' })); // Limpiamos el input
@@ -74,7 +74,7 @@ function App() {
     const token = localStorage.getItem('token');
     const nuevoEstado = estadoActual === 1 ? 0 : 1; // Si es 1 pasa a 0, y viceversa
     try {
-      await axios.put(`http://localhost:5000/api/subtareas/alternar/${subtareaId}`, { completado: nuevoEstado }, {
+      await axios.put(`https://shegoals.onrender.com/api/subtareas/alternar/${subtareaId}`, { completado: nuevoEstado }, {
         headers: { Authorization: token }
       });
       cargarSubtareas(objetivoId, token); // Refrescamos el estado visual
@@ -92,10 +92,10 @@ function App() {
     setMensaje('');
     try {
       if (vista === 'registro') {
-        const respuesta = await axios.post('http://localhost:5000/api/auth/register', formData);
+        const respuesta = await axios.post('https://shegoals.onrender.com/api/auth/register', formData);
         setMensaje(respuesta.data.msg);
       } else {
-        const respuesta = await axios.post('http://localhost:5000/api/auth/login', {
+        const respuesta = await axios.post('https://shegoals.onrender.com/api/auth/login', {
           email: formData.email,
           password: formData.password
         });
@@ -112,7 +112,7 @@ function App() {
     e.preventDefault();
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:5000/api/objetivos/crear', nuevoObjetivo, {
+      await axios.post('https://shegoals.onrender.com/api/objetivos/crear', nuevoObjetivo, {
         headers: { Authorization: token }
       });
       setNuevoObjetivo({ titulo: '', descripcion: '', categoria: 'Carrera', fecha_inicio: '', fecha_fin: '' });
@@ -126,7 +126,7 @@ function App() {
   const ejecutarEliminarObjetivo = async () => {
     const token = localStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:5000/api/objetivos/eliminar/${idMetaAEliminar}`, {
+      await axios.delete(`https://shegoals.onrender.com/api/objetivos/eliminar/${idMetaAEliminar}`, {
         headers: { Authorization: token }
       });
       cargarObjetivos(token);
