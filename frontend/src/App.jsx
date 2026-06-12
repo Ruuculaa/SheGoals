@@ -92,10 +92,12 @@ function App() {
     setMensaje('');
     try {
       if (vista === 'registro') {
-        const respuesta = await axios.post('https://shegoals.onrender.com/api/auth/register', formData);
+        // 🔥 Corregido: cambiamos /api/auth/register por /api/usuarios/registro
+        const respuesta = await axios.post('https://shegoals.onrender.com/api/usuarios/registro', formData);
         setMensaje(respuesta.data.msg);
       } else {
-        const respuesta = await axios.post('https://shegoals.onrender.com/api/auth/login', {
+        // 🔥 Corregido: cambiamos /api/auth/login por /api/usuarios/login
+        const respuesta = await axios.post('https://shegoals.onrender.com/api/usuarios/login', {
           email: formData.email,
           password: formData.password
         });
@@ -104,7 +106,7 @@ function App() {
         cargarObjetivos(respuesta.data.token);
       }
     } catch (error) {
-      setMensaje(error.response ? error.response.data.msg : 'Error');
+      setMensaje(error.response ? error.response.data.msg : 'Error al conectar');
     }
   };
 
