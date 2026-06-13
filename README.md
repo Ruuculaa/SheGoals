@@ -38,5 +38,5 @@ Sigue estos sencillos pasos para tener la aplicación corriendo en tu ordenador:
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/tu-usuario/shegoals.git](https://github.com/tu-usuario/shegoals.git)
+git clone [https://github.com/Ruuculaa/shegoals.git](https://github.com/Ruuculaa/shegoals.git)
 cd shegoals
