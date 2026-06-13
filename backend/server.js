@@ -19,7 +19,6 @@ app.listen(PORT, () => {
 });
 
 // Rutas de Autenticación
-app.use('/api/auth', require('./routes/authRoutes'));
-// Rutas de Objetivos
+app.use('/api/usuarios', require('./routes/authRoutes'));
 app.use('/api/objetivos', require('./routes/objetivoRoutes'));
 app.use('/api/subtareas', require('./routes/subtareaRoutes'));
