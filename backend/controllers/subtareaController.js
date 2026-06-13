@@ -1,35 +1,41 @@
-const db = require('../db');
+const express = require('express');
+const router = express.Router();
+const pool = require('../db');
 
-// 1. Listar subtareas de un objetivo específico
-exports.listarSubtareas = async (req, res) => {
-    const { objetivo_id } = req.params;
-    try {
-        const [rows] = await db.query('SELECT * FROM subtareas WHERE objetivo_id = ? ORDER BY id ASC', [objetivo_id]);
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ msg: 'Error al listar subtareas' });
-    }
-};
+router.get('/:objetivo_id', async (req, res) => {
+  try {
+    const [resultado] = await pool.query('SELECT * FROM subtareas WHERE objetivo_id = ? ORDER BY id ASC', [req.params.objetivo_id]);
+    res.json(resultado);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error obteniendo subtareas');
+  }
+});
 
-// 2. Crear una nueva subtarea
-exports.crearSubtarea = async (req, res) => {
-    const { objetivo_id, texto } = req.body;
-    try {
-        await db.query('INSERT INTO subtareas (objetivo_id, texto) VALUES (?, ?)', [objetivo_id, texto]);
-        res.json({ msg: 'Subtarea añadida' });
-    } catch (error) {
-        res.status(500).json({ msg: 'Error al crear subtarea' });
-    }
-};
+router.post('/crear', async (req, res) => {
+  const { objetivo_id, texto } = req.body;
+  try {
+    const [resultado] = await pool.query(
+      'INSERT INTO subtareas (objetivo_id, texto, completado) VALUES (?, ?, 0)',
+      [objetivo_id, texto]
+    );
+    // MySQL devuelve el ID en insertId
+    res.json({ id: resultado.insertId, objetivo_id, texto, completado: 0 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error creando subtarea');
+  }
+});
 
-// 3. Alternar estado (Completado / Pendiente)
-exports.alternarSubtarea = async (req, res) => {
-    const { id } = req.params;
-    const { completado } = req.body; // Recibe 1 o 0
-    try {
-        await db.query('UPDATE subtareas SET completado = ? WHERE id = ?', [completado, id]);
-        res.json({ msg: 'Estado actualizado' });
-    } catch (error) {
-        res.status(500).json({ msg: 'Error al actualizar subtarea' });
-    }
-};
+router.put('/alternar/:id', async (req, res) => {
+  const { completado } = req.body;
+  try {
+    await pool.query('UPDATE subtareas SET completado = ? WHERE id = ?', [completado, req.params.id]);
+    res.json({ msg: 'Estado actualizado' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error actualizando subtarea');
+  }
+});
+
+module.exports = router;

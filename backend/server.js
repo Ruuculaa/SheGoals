@@ -1,24 +1,25 @@
-// Importamos la librería Express que instalamos antes
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
+
 const app = express();
-// Definimos el puerto donde escuchará el servidor (el 5000 es un clásico para backends)
-const PORT = 5000;
 
-// Configuramos el servidor para que entienda formato JSON
+// Configuración abierta de CORS para evitar cualquier bloqueo local
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
-app.use(cors());
-// Creamos nuestra primera ruta de prueba (Ruta raíz)
-app.get('/', (req, res) => {
-    res.send('¡El backend de SheGoals está vivo y funcionando sin pagar un céntimo!');
-});
 
-// Le decimos al servidor que empiece a escuchar peticiones
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en: http://localhost:${PORT}`);
-});
-
-// Rutas de Autenticación
+// 📁 Tus rutas locales vinculadas a tus archivos reales
 app.use('/api/usuarios', require('./routes/authRoutes'));
 app.use('/api/objetivos', require('./routes/objetivoRoutes'));
 app.use('/api/subtareas', require('./routes/subtareaRoutes'));
+
+// Puerto del servidor
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en: http://localhost:${PORT}`);
+});

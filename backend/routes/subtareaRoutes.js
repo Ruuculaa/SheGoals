@@ -2,39 +2,49 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
-// Obtener subtareas de una meta
+// 🔍 Obtener todas las subtareas de una meta concreta
 router.get('/:objetivo_id', async (req, res) => {
   try {
-    const resultado = await pool.query('SELECT * FROM subtareas WHERE objetivo_id = $1 ORDER BY id ASC', [req.params.objetivo_id]);
-    res.json(resultado.rows);
+    const [resultado] = await pool.query(
+      'SELECT * FROM subtareas WHERE objetivo_id = ? ORDER BY id ASC', 
+      [req.params.objetivo_id]
+    );
+    res.json(resultado);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error obteniendo subtareas');
   }
 });
 
-// Crear una subtarea nueva
+// 📝 Crear una subtarea nueva
 router.post('/crear', async (req, res) => {
   const { objetivo_id, texto } = req.body;
   try {
-    const resultado = await pool.query(
-      'INSERT INTO subtareas (objetivo_id, texto, completado) VALUES ($1, $2, 0) RETURNING *',
+    const [resultado] = await pool.query(
+      'INSERT INTO subtareas (objetivo_id, texto, completado) VALUES (?, ?, 0)',
       [objetivo_id, texto]
     );
-    res.json(resultado.rows[0]);
+    // En MySQL, el ID autoincremental de la nueva fila viene en resultado.insertId
+    res.json({ 
+      id: resultado.insertId, 
+      objetivo_id, 
+      texto, 
+      completado: 0 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error creando subtarea');
   }
 });
 
-// Alternar estado (Completada/Pendiente)
+// 🔄 Alternar el estado (Completado / Pendiente)
 router.put('/alternar/:id', async (req, res) => {
   const { completado } = req.body;
   try {
-    // Convertimos boicoteos de JS a un entero 1 o 0 para la base de datos
-    const estadoInt = completado ? 1 : 0;
-    await pool.query('UPDATE subtareas SET completado = $1 WHERE id = $2', [estadoInt, req.params.id]);
+    await pool.query(
+      'UPDATE subtareas SET completado = ? WHERE id = ?', 
+      [completado, req.params.id]
+    );
     res.json({ msg: 'Estado actualizado' });
   } catch (err) {
     console.error(err);
@@ -42,4 +52,15 @@ router.put('/alternar/:id', async (req, res) => {
   }
 });
 
+
+// 🗑️ Eliminar una subtarea individual
+router.delete('/eliminar/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM subtareas WHERE id = ?', [req.params.id]);
+    res.json({ msg: 'Subtarea eliminada con éxito' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al eliminar subtarea');
+  }
+});
 module.exports = router;
